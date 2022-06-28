@@ -1,0 +1,4 @@
+./venv
+*.db
+# Project exclude paths
+/venv/
