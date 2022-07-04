@@ -1,9 +1,10 @@
 from flask import Flask, request, jsonify
-from flask_restful import Api, Resource
-from flask_jwt_extended import JWTManager, create_access_token, jwt_required
+from flask_restful import Api
+from flask_jwt_extended import JWTManager, create_access_token
 
-from item import Item, ItemList
-from user import User, UserRegister
+from models.user import User
+from resources.itemresource import ItemResource, ItemList
+from resources.user import UserResource
 
 app = Flask(__name__)
 api = Api(app)
@@ -21,9 +22,9 @@ def login():
     return jsonify({"message": "username/password are incorrect"}, 401)
 
 
-api.add_resource(Item, "/item/<string:name>")
+api.add_resource(ItemResource, "/item/<string:name>")
 api.add_resource(ItemList, "/items")
-api.add_resource(UserRegister, "/users")
+api.add_resource(UserResource, "/users")
 
 if __name__ == "__main__":
     app.run()

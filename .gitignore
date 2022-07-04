@@ -2,3 +2,4 @@
 *.db
 # Project exclude paths
 /venv/
+/.idea
