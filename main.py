@@ -17,11 +17,6 @@ app.config['PROPAGATE_EXCEPTIONS'] = True
 jwt = JWTManager(app)
 
 
-@app.before_first_request
-def create_tables():
-    db.create_all()
-
-
 @app.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
