@@ -1,5 +1,3 @@
-import sqlite3
-
 from flask import request
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
@@ -23,44 +21,33 @@ class ItemResource(Resource):
             return {"message": f"This name ({name}) already exists"}, 400
 
         try:
-            new_item = Item(name, data["price"])
-            new_item.insert()
+            new_item = Item(name, data["price"], data["store_id"])
+            new_item.save_to_db()
             return new_item.json(), 201
         except Exception:
             return {"message": f"An error occurred"}, 500
 
     def delete(self, name):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
-        query = "DELETE from items WHERE name=?"
-        cursor.execute(query, (name,))
+        item = Item.find_by_name(name)
 
-        connection.commit()
-        connection.close()
+        if item:
+            item.delete_from_db()
 
-        return {"message": "item deleted or does not exists"}
+        return {"message": "item deleted or does not exists"}, 204
 
     def put(self, name):
         data = request.get_json()
         item = Item.find_by_name(name)
         if item:
-            item.update()
-            return {"item": item.json()}
+            item.price = data["price"]
+            item.save_to_db()
+            return {"item": item.json()}, 200
 
-        new_item = Item(name, data["price"])
-        new_item.insert()
+        new_item = Item(name, data["price"], data["store_id"])
+        new_item.save_to_db()
         return {"item": new_item.json()}, 201
 
 
 class ItemList(Resource):
     def get(self):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
-        query = "SELECT * from items"
-        result = cursor.execute(query)
-        items = []
-        for row in result:
-            items.append({"name": row[0], "price": row[1]})
-
-        connection.close()
-        return {"items": items}
+        return {"items": [item.json() for item in Item.query.all()]}
