@@ -13,7 +13,7 @@ class ItemResource(Resource):
 
         return {"item": None}, 404
 
-    @jwt_required()
+    @jwt_required(fresh=True)
     def post(self, name):
         data = request.get_json()
         item = Item.find_by_name(name)
